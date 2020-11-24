@@ -1,0 +1,78 @@
+---
+# defaults file for master
+
+
+# Variable which is common for most projects, used in
+# configuration files or file/directory names.
+# By default used as reference for kubernetes_project_dir variable:
+kubernetes_project_name: test
+
+# Variable which is common for most projects, used as
+# project working directory on the localhost for the role.
+# Currently is used for copying etcd certificates to control plane nodes,
+# to download admin kube config to localhost and install initial psp if needed:
+kubernetes_project_dir: files/{{ kubernetes_project_name }}
+
+# Version of Kubernetes cluster which will be bootstrapped:
+kubernetes_version: 1.14.10
+
+# If to enable apiserver audit or not:
+kubernetes_apiserver_audit: false
+
+# If defined, this string will encrypt secret data at etcd:
+kubernetes_esdar_key: ""        # Ckcp7YnRWbfta8toDYkjD3jLB08Crgct6oFlrLMZ82k=
+
+# DNS name or IP address which will be listening for apiserver requests,
+# this must equal to virtual IP to work correct in HA setup:
+kubernetes_apiserver_host: ""
+
+# Port which will listen for apiserser requests on apiserver host:
+kubernetes_apiserver_port:
+
+# List of external etcd DNS names or IP addresses to use as backend for apiserver:
+kubernetes_external_etcds: "{{ groups.etcdcluster }}"
+
+# List of admission controllers to be enabled in cluster:
+kubernetes_admission_plugins:
+- NodeRestriction
+- AlwaysPullImages
+- NamespaceLifecycle
+- LimitRanger
+- ServiceAccount
+- DefaultStorageClass
+- DefaultTolerationSeconds
+- MutatingAdmissionWebhook
+- ValidatingAdmissionWebhook
+- ResourceQuota
+
+# Minimum version of TLS for control-plane components, usually
+# this must be the same as for load balancer as well as for etcd:
+kubernetes_tls_min_version: VersionTLS12
+
+# TLS cipher suites to use for control-plane components, usually
+# this must be the same as for load balancer as well as for etcd:
+kubernetes_tls_cipher_suites:
+- TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+- TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+- TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+- TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+- TLS_RSA_WITH_AES_128_GCM_SHA256
+- TLS_RSA_WITH_AES_256_GCM_SHA384
+
+# Token which will be used in cluster initialization, so
+# other nodes can join the cluster using it:
+kubernetes_bootstrap_token: ""          # 123456.abcdefghijklmnop
+
+# Key used in cluster initialization, so
+# other control-plane nodes can join the cluster using it:
+kubernetes_certificate_key: ""          # 1a2b3c4d5e6f7g8h9i10j11k12l13m14n15o16p17q18r19s20t21u22v23w24xy
+
+# List of preflight errors which must be ignored while initializing
+# cluster or joining node to existing cluster via kubeadm:
+kubernetes_ignore_preflight_errors: []
+# - NumCPU
+
+# Localhost directory used to keep k8s manifests and other role files:
+kubernetes_local_dir: files

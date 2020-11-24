@@ -1,0 +1,76 @@
+---
+# tasks file for kubernetes/master
+- name: open firewall ports
+  firewalld:
+    immediate: yes
+    permanent: yes
+    port: "{{ item }}/tcp"
+    state: enabled
+  with_items:
+  - 6443
+  - 10251-10252
+
+- name: copy etcd-ca and apiserver-etcd-client certs
+  copy:
+    src: "{{ kubernetes_project_dir }}/etcd/pki/{{ item.src }}"
+    dest: /etc/kubernetes/{{ item.dest }}
+  with_items:
+  - src: etcd/ca.crt
+    dest: pki/etcd/
+  - src: apiserver-etcd-client.crt
+    dest: pki/
+  - src: apiserver-etcd-client.key
+    dest: pki/
+
+- name: create audit directory
+  file:
+    path: /etc/kubernetes/audit-policy
+    state: directory
+    mode: 0400
+  when: kubernetes_apiserver_audit
+
+- name: copy audit config
+  copy:
+    src: etc_kubernetes_audit-policy_apiserver-audit-policy.yml
+    dest: /etc/kubernetes/audit-policy/apiserver-audit-policy.yml
+    mode: 0400
+  when: kubernetes_apiserver_audit
+  notify:
+  - restart kubelet
+
+- name: create esdar directory
+  file:
+    path: /etc/kubernetes/esdar
+    state: directory
+    mode: 0400
+  when: kubernetes_esdar_key | length
+
+- name: copy encryption config
+  template:
+    src: etc_kubernetes_esdar_secrets_encryption.yml.j2
+    dest: /etc/kubernetes/esdar/secrets_encryption.yml
+    mode: 0400
+  when: kubernetes_esdar_key | length
+  notify:
+  - restart kubelet
+
+- import_tasks: master_init.yml
+  when: inventory_hostname in ansible_play_batch[0]
+  tags:
+  - never
+
+- import_tasks: master_join.yml
+  when: inventory_hostname not in ansible_play_batch[0]
+  tags:
+  - never
+
+- name: install initial psp
+  shell: |
+    kubectl apply -f {{ kubernetes_local_dir }}/kubernetes/psp/default/
+  environment:
+    KUBECONFIG: "{{ kubernetes_project_dir }}/master/admin.conf"
+  delegate_to: localhost
+  connection: local
+  run_once: true
+  become: no
+  when: "'PodSecurityPolicy' in kubernetes_admission_plugins"
