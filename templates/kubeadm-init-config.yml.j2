@@ -55,6 +55,8 @@ apiServer:
     {% endif -%}
     profiling: "False"
     authorization-mode: Node,RBAC
+    anonymous-auth: "False"
+    kubelet-certificate-authority: /etc/kubernetes/pki/ca.crt
     service-account-lookup: "True"
     default-not-ready-toleration-seconds: "90"
     default-unreachable-toleration-seconds: "90"
@@ -86,7 +88,7 @@ kind: KubeletConfiguration
 kubeAPIQPS: 5
 eventRecordQPS: 0
 readOnlyPort: 0
-streamingConnectionIdleTimeout: 0h15m0s
+streamingConnectionIdleTimeout: 0h5m0s
 cgroupDriver: systemd
 rotateCertificates: true
 authentication:
