@@ -66,6 +66,8 @@ apiServer:
 
 controllerManager:
   extraArgs:
+    bind-address: 0.0.0.0
+    secure-port: 10252
     profiling: "False"
     node-monitor-period: 5s
     node-monitor-grace-period: 40s
@@ -76,6 +78,8 @@ controllerManager:
 
 scheduler:
   extraArgs:
+    bind-address: 0.0.0.0
+    secure-port: 10251
     profiling: "False"
     tls-min-version: {{ kubernetes_tls_min_version }}
     tls-cipher-suites: {% for tcs in kubernetes_tls_cipher_suites %}{{ tcs }}{{ "," if not loop.last }}{% endfor %}
@@ -99,3 +103,8 @@ tlsCipherSuites:
 {% for tcs in kubernetes_tls_cipher_suites -%}
 - {{ tcs }}
 {% endfor -%}
+
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+metricsBindAddress: 0.0.0.0
