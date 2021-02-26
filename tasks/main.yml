@@ -18,13 +18,13 @@
   with_items:
   - src: etcd/ca.crt
     dest: pki/etcd/
-    mode: 0640
+    mode: '0640'
   - src: apiserver-etcd-client.crt
     dest: pki/
-    mode: 0640
+    mode: '0640'
   - src: apiserver-etcd-client.key
     dest: pki/
-    mode: 0600
+    mode: '0600'
 
 - name: create audit directory
   file:
