@@ -67,7 +67,7 @@ apiServer:
 controllerManager:
   extraArgs:
     bind-address: 0.0.0.0
-    secure-port: 10252
+    secure-port: "10252"
     profiling: "False"
     node-monitor-period: 5s
     node-monitor-grace-period: 40s
@@ -79,7 +79,7 @@ controllerManager:
 scheduler:
   extraArgs:
     bind-address: 0.0.0.0
-    secure-port: 10251
+    secure-port: "10251"
     profiling: "False"
     tls-min-version: {{ kubernetes_tls_min_version }}
     tls-cipher-suites: {% for tcs in kubernetes_tls_cipher_suites %}{{ tcs }}{{ "," if not loop.last }}{% endfor %}
